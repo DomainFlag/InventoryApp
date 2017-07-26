@@ -6,6 +6,9 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -18,9 +21,12 @@ import android.widget.ListView;
 
 import com.example.cchiv.inventoryapp.data.ItemContract.ItemEntry;
 
+import java.io.ByteArrayOutputStream;
+
 public class MainActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     ItemCursorAdapter itemCursorAdapter;
+    private final static int REQUEST_CODE = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,12 +71,19 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.menu_insert_dummy : {
+                Drawable drawable = getDrawable(R.drawable.ic_box);
+                Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+                byte[] bitmapdata = outputStream.toByteArray();
+
                 ContentValues contentValues = new ContentValues();
+                contentValues.put(ItemEntry.COL_ITEM_IMAGE, bitmapdata);
                 contentValues.put(ItemEntry.COL_ITEM_NAME, "Screwdriver");
                 contentValues.put(ItemEntry.COL_ITEM_QUANTITY, "69");
                 contentValues.put(ItemEntry.COL_ITEM_PRICE, "69");
                 contentValues.put(ItemEntry.COL_ITEM_SUPPLIER, "Screwdrivers corp.");
-                Uri uri = getContentResolver().insert(Uri.parse("content://com.example.android.items/items"), contentValues);
+                getContentResolver().insert(Uri.parse("content://com.example.android.items/items"), contentValues);
                 break;
             }
             case R.id.menu_empty_inventory : {
@@ -85,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = {
                 ItemEntry._ID,
+                ItemEntry.COL_ITEM_IMAGE,
                 ItemEntry.COL_ITEM_NAME,
                 ItemEntry.COL_ITEM_QUANTITY,
                 ItemEntry.COL_ITEM_PRICE,

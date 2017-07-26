@@ -15,6 +15,7 @@ public class ItemContract {
         public static final String TABLE_NAME = "items";
 
         public static final String _ID = BaseColumns._ID;
+        public static final String COL_ITEM_IMAGE = "image";
         public static final String COL_ITEM_NAME = "name";
         public static final String COL_ITEM_QUANTITY = "quantity";
         public static final String COL_ITEM_PRICE = "price";

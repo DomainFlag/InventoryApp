@@ -75,12 +75,12 @@ public class ItemProvider extends ContentProvider{
         }
 
         int quantity = values.getAsInteger(ItemEntry.COL_ITEM_QUANTITY);
-        if (quantity < 1) {
+        if (quantity < 0) {
             throw new IllegalArgumentException("Item has to have a positive nb. of quantity");
         }
 
         int price = values.getAsInteger(ItemEntry.COL_ITEM_PRICE);
-        if (price < 1) {
+        if (price < 0) {
             throw new IllegalArgumentException("Item has to have a real price");
         }
 
@@ -143,14 +143,14 @@ public class ItemProvider extends ContentProvider{
 
         if(values.containsKey(ItemEntry.COL_ITEM_QUANTITY)) {
             int quantity = values.getAsInteger(ItemEntry.COL_ITEM_QUANTITY);
-            if (quantity < 1) {
+            if (quantity < 0) {
                 throw new IllegalArgumentException("Item has to have a positive nb. of quantity");
             }
         }
 
         if(values.containsKey(ItemEntry.COL_ITEM_PRICE)) {
             int price = values.getAsInteger(ItemEntry.COL_ITEM_PRICE);
-            if (price < 1) {
+            if (price < 0) {
                 throw new IllegalArgumentException("Item has to have a real price");
             }
         }
