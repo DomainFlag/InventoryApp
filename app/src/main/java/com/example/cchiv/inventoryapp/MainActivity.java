@@ -1,8 +1,10 @@
 package com.example.cchiv.inventoryapp;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
                 break;
             }
             case R.id.menu_empty_inventory : {
-                getContentResolver().delete(Uri.parse("content://com.example.android.items/items"), null, null);
+                showDeleteConfirmationDialog();
                 break;
             }
         }
@@ -116,5 +118,29 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         itemCursorAdapter.swapCursor(null);
+    }
+
+    private void deleteItems() {
+        getContentResolver().delete(Uri.parse("content://com.example.android.items/items"), null, null);
+    }
+
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.main_delete_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                deleteItems();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

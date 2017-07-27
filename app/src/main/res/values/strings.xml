@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">InventoryApp</string>
+
+    <string name="editor_delete_item_successful">Item deleted</string>
+    <string name="editor_delete_item_failed">Error with deleting item</string>
+    <string name="delete_dialog_msg">Delete this item?</string>
+
+    <string name="main_delete_items_successful">Items deleted</string>
+    <string name="main_delete_item_failed">Error with deleting items</string>
+    <string name="main_delete_dialog_msg">Delete all items?</string>
+
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
 </resources>

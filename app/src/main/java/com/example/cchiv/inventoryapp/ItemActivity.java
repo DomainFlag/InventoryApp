@@ -1,9 +1,11 @@
 package com.example.cchiv.inventoryapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -43,6 +45,7 @@ public class ItemActivity extends AppCompatActivity implements LoaderCallbacks<C
     private EditText editTextSupplier;
 
     private boolean editMode;
+    private boolean addedImage;
     private final static int REQUEST_CODE = 10;
 
     @Override
@@ -59,11 +62,13 @@ public class ItemActivity extends AppCompatActivity implements LoaderCallbacks<C
         Intent intent = getIntent();
         uri = intent.getData();
 
+        addedImage = false;
+
         if(uri != null) {
             editMode = true;
             getLoaderManager().initLoader(1, null, this);
         } else {
-
+            invalidateOptionsMenu();
             editMode = false;
             uri = Uri.parse("content://com.example.android.items/items");
         }
@@ -148,6 +153,8 @@ public class ItemActivity extends AppCompatActivity implements LoaderCallbacks<C
                     ImageView imageView = (ImageView) findViewById(R.id.item_image);
                     imageView.setImageBitmap(bitmap);
                     imageView.setTag(bitmap);
+
+                    addedImage = true;
                 } catch (FileNotFoundException io) {
                     Toast.makeText(this, "Failed to upload image, try again", Toast.LENGTH_LONG).show();
                 }
@@ -162,18 +169,28 @@ public class ItemActivity extends AppCompatActivity implements LoaderCallbacks<C
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if(!editMode) {
+            MenuItem menuItem = menu.findItem(R.id.menu_delete_item);
+            menuItem.setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_save_item : {
+
                 ContentValues contentValues = new ContentValues();
-                if(imageViewImage.getDrawable() == null)
-                    return false;
-                Bitmap bitmap = ((BitmapDrawable)imageViewImage.getDrawable()).getBitmap();
+
+                Bitmap bitmap = ((BitmapDrawable) imageViewImage.getDrawable()).getBitmap();
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
                 byte[] image = outputStream.toByteArray();
-
                 contentValues.put(ItemEntry.COL_ITEM_IMAGE, image);
+
                 if(TextUtils.isEmpty(editTextName.getEditableText())) {
                     Toast.makeText(this, "Please enter a name", Toast.LENGTH_LONG).show();
                     return false;
@@ -198,8 +215,7 @@ public class ItemActivity extends AppCompatActivity implements LoaderCallbacks<C
                 break;
             }
             case R.id.menu_delete_item : {
-                getContentResolver().delete(uri, null, null);
-                finish();
+                showDeleteConfirmationDialog();
                 break;
             }
         }
@@ -241,4 +257,31 @@ public class ItemActivity extends AppCompatActivity implements LoaderCallbacks<C
         editTextPrice.setText("");
         editTextSupplier.setText("");
     }
+
+    private void deleteItem() {
+        getContentResolver().delete(uri, null, null);
+        finish();
+    }
+
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.delete_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                deleteItem();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 }
+
+
