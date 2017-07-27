@@ -9,11 +9,14 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -128,6 +131,20 @@ public class ItemActivity extends AppCompatActivity implements LoaderCallbacks<C
                 try {
                     InputStream inputStream = getContentResolver().openInputStream(uri);
                     Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
+                    Display display = getWindowManager().getDefaultDisplay();
+                    Point size = new Point();
+                    display.getSize(size);
+
+                    int width = bitmap.getWidth();
+                    int height = bitmap.getHeight();
+                    float scaleWidth = ((float) size.x) / width;
+                    float scaleHeight = ((float) size.y) / height / 3;
+                    Matrix matrix = new Matrix();
+                    matrix.postScale(scaleWidth, scaleHeight);
+                    bitmap = Bitmap.createBitmap(
+                            bitmap, 0, 0, width, height, matrix, false);
+
                     ImageView imageView = (ImageView) findViewById(R.id.item_image);
                     imageView.setImageBitmap(bitmap);
                     imageView.setTag(bitmap);
